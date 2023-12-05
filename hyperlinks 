@@ -1,0 +1,40 @@
+To extract hyperlinks from a PDF file in Python, you can use the `PyMuPDF` library (also known as `fitz`). It allows you to read PDF files and extract various elements, including hyperlinks. This library is more efficient for dealing with links compared to `PyPDF2` or `pdfplumber` as it can handle both explicit URLs and linked text (shortnames for URLs).
+
+First, you'll need to install PyMuPDF:
+
+```bash
+pip install PyMuPDF
+```
+
+Then, you can use the following function to extract hyperlinks from a PDF:
+
+```python
+import fitz  # PyMuPDF
+
+def extract_hyperlinks(pdf_path):
+    hyperlinks = []
+
+    # Open the PDF file
+    with fitz.open(pdf_path) as doc:
+        # Iterate through each page
+        for page in doc:
+            # Get list of links in the page
+            links = page.get_links()
+            for link in links:
+                # Check if it is a URI type link
+                if link['kind'] == fitz.LINK_URI:
+                    hyperlinks.append(link['uri'])
+                # Check for internal links and other types if needed
+
+    return hyperlinks
+
+# Usage
+pdf_file_path = 'path_to_your_pdf.pdf'
+links = extract_hyperlinks(pdf_file_path)
+for link in links:
+    print(link)
+```
+
+This function `extract_hyperlinks` will open the specified PDF file and iterate through each page, gathering all the hyperlinks it finds. The `get_links()` method retrieves all links on a page, and the function checks for each link's type. If the link is a URI (i.e., a web link), it's added to the `hyperlinks` list.
+
+Replace `'path_to_your_pdf.pdf'` with the path to your PDF file. This script will print out all the hyperlinks found in the PDF. If you need to handle internal links or other types of links, you can extend the logic within the loop that iterates over `links`.
