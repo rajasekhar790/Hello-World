@@ -38,3 +38,57 @@ for link in links:
 This function `extract_hyperlinks` will open the specified PDF file and iterate through each page, gathering all the hyperlinks it finds. The `get_links()` method retrieves all links on a page, and the function checks for each link's type. If the link is a URI (i.e., a web link), it's added to the `hyperlinks` list.
 
 Replace `'path_to_your_pdf.pdf'` with the path to your PDF file. This script will print out all the hyperlinks found in the PDF. If you need to handle internal links or other types of links, you can extend the logic within the loop that iterates over `links`.
+
+
+
+To extract and save images from a PDF file to the current working directory using the PyMuPDF library (also known as `fitz`), you can create a Python function as follows. This function will iterate through each page of the PDF, extract each image, and save it as a file in the current working directory:
+
+First, ensure you have PyMuPDF installed:
+
+```bash
+pip install PyMuPDF
+```
+
+Now, here's the function to extract and save images:
+
+```python
+import fitz  # PyMuPDF
+import os
+
+def extract_and_save_images(pdf_path):
+    # Open the PDF file
+    with fitz.open(pdf_path) as doc:
+        image_count = 0
+        # Iterate through each page
+        for page_num in range(len(doc)):
+            # Get the page
+            page = doc.load_page(page_num)
+
+            # Get the list of image dicts on the current page
+            image_list = page.get_images(full=True)
+
+            # Iterate through each image
+            for image_index, img in enumerate(page.get_images(full=True)):
+                xref = img[0]
+                base_image = doc.extract_image(xref)
+                image_bytes = base_image["image"]
+
+                # Construct a filename for each image
+                image_filename = f"image{page_num + 1}_{image_index + 1}.png"
+                with open(image_filename, "wb") as img_file:
+                    img_file.write(image_bytes)
+                
+                print(f"Saved image as {image_filename}")
+                image_count += 1
+
+    return image_count
+
+# Usage
+pdf_file_path = 'path_to_your_pdf.pdf'
+number_of_images = extract_and_save_images(pdf_file_path)
+print(f"Extracted and saved {number_of_images} images.")
+```
+
+This function, `extract_and_save_images`, will go through each page of the provided PDF file, extract each image, and save it as a PNG file in the current working directory. The images are named in the format `image{page_number}_{image_index}.png`, where `{page_number}` is the page number in the PDF and `{image_index}` is the index of the image on that page.
+
+Remember to replace `'path_to_your_pdf.pdf'` with the path to your actual PDF file. After running this function, the extracted images will be saved in the directory where you run your Python script.
